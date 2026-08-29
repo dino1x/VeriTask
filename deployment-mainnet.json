@@ -1,0 +1,9 @@
+{
+  "contractAddress": "0xb86d25CD0317dE545C8573f040a589c34A093544",
+  "deployer": "0x5222A33A4CaBC993F8354b9fCfD753Cc8C1439FA",
+  "txHash": "0x86e597e9d6f29955f3547ded95c2f6fa2246295d7487f82390b09019d553eea6",
+  "network": "0G Aristotle Mainnet",
+  "chainId": "16661",
+  "rpc": "https://evmrpc.0g.ai",
+  "deployedAt": "2026-08-28T16:36:34.231Z"
+}

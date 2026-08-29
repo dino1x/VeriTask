@@ -1,0 +1,41 @@
+{
+  "name": "veritask-escrow0g",
+  "version": "1.0.0",
+  "description": "Verifiable Autonomous Agent Task Verification & Escrow Protocol built on 0G Chain, 0G Storage, and 0G Compute",
+  "main": "index.js",
+  "scripts": {
+    "dev": "next dev frontend",
+    "build:frontend": "next build frontend",
+    "start:frontend": "next start frontend",
+    "test": "hardhat test",
+    "test:contracts": "hardhat test",
+    "deploy:0g": "ts-node scripts/deploy.ts",
+    "deploy:mainnet": "node scripts/deploy-mainnet.js",
+    "test:0g": "ts-node scripts/test-0g-live.ts",
+    "seed:bounties": "ts-node scripts/seed-bounties.ts"
+  },
+  "keywords": [
+    "0G",
+    "zero-gravity",
+    "escrow",
+    "ai-agent",
+    "verifiable-compute",
+    "decentralized-storage",
+    "web3"
+  ],
+  "author": "VeriTask Team",
+  "license": "MIT",
+  "devDependencies": {
+    "@nomicfoundation/hardhat-toolbox": "^5.0.0",
+    "@types/node": "^20.11.0",
+    "dotenv": "^16.4.5",
+    "hardhat": "^2.22.2",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.4.5"
+  },
+  "dependencies": {
+    "@openzeppelin/contracts": "^5.0.2",
+    "ethers": "^6.11.1",
+    "axios": "^1.6.8"
+  }
+}
