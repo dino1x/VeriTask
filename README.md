@@ -96,7 +96,8 @@ npm run test:0g
 ### 5. Launch Frontend DApp
 Open `frontend/index.html` in your browser or run:
 ```bash
-npx serve frontend
+npx serve -p 3000 frontend
+# Open http://localhost:3000
 ```
 
 ---
