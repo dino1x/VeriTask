@@ -695,30 +695,55 @@
       const btn = document.getElementById('walletLabel');
       const net = NETWORKS[currentNetworkKey];
       if (userAccount) {
-        userAccount = null; userBalance = '0.00';
+        userAccount = null; 
+        userBalance = '0.00';
         btn.innerText = 'Connect Wallet';
         showToast('Wallet disconnected');
         return;
       }
-      if (window.ethereum) {
-        try {
-          const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-          if (accounts && accounts.length > 0) {
-            userAccount = accounts[0];
-            try {
-              const provider = new ethers.BrowserProvider(window.ethereum);
-              userBalance = ethers.formatEther(await provider.getBalance(userAccount));
-            } catch (e) {}
-            btn.innerText = `${userAccount.slice(0, 6)}...${userAccount.slice(-4)} (${Number(userBalance).toFixed(2)} 0G)`;
-            showToast(`Connected to ${net.name}: ${userAccount.slice(0, 8)}...`);
-            return;
-          }
-        } catch (e) {}
+      if (!window.ethereum) {
+        showToast('MetaMask not detected. Please install MetaMask extension.');
+        return;
       }
-      userAccount = '0x5222A33A...39FA';
-      userBalance = '0.49';
-      btn.innerText = `${userAccount} (${userBalance} 0G)`;
-      showToast(`Connected to ${net.name} (${net.chainIdDec})`);
+      try {
+        showToast('Connecting to MetaMask...');
+        const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+        if (accounts && accounts.length > 0) {
+          userAccount = accounts[0];
+          try {
+            const provider = new ethers.BrowserProvider(window.ethereum);
+            const bal = await provider.getBalance(userAccount);
+            userBalance = ethers.formatEther(bal);
+          } catch (err) {
+            userBalance = '0.00';
+          }
+          btn.innerText = `${userAccount.slice(0, 6)}...${userAccount.slice(-4)} (${Number(userBalance).toFixed(2)} 0G)`;
+          showToast(`Connected: ${userAccount.slice(0, 6)}...${userAccount.slice(-4)} on ${net.name}`);
+
+          // Listen for account switching in MetaMask
+          window.ethereum.on('accountsChanged', (newAccounts) => {
+            if (newAccounts && newAccounts.length > 0) {
+              userAccount = newAccounts[0];
+              btn.innerText = `${userAccount.slice(0, 6)}...${userAccount.slice(-4)}`;
+              showToast(`Switched account: ${userAccount.slice(0, 6)}...`);
+            } else {
+              userAccount = null;
+              btn.innerText = 'Connect Wallet';
+              showToast('Wallet disconnected');
+            }
+          });
+          return;
+        }
+      } catch (err) {
+        console.warn('MetaMask connection notice:', err);
+        if (err.code === 4001) {
+          showToast('Connection request rejected in MetaMask.');
+        } else if (err.code === -32002) {
+          showToast('MetaMask connection request already pending. Please open your MetaMask extension.');
+        } else {
+          showToast(err.message || 'Failed to connect MetaMask.');
+        }
+      }
     }
 
     async function handleCreateBounty(e) {
@@ -778,6 +803,30 @@
           document.getElementById('network-dropdown')?.classList.add('hidden');
         }
       });
+
+      // Check if user is already connected in MetaMask
+      if (window.ethereum) {
+        window.ethereum.request({ method: 'eth_accounts' }).then(accounts => {
+          if (accounts && accounts.length > 0) {
+            userAccount = accounts[0];
+            const btn = document.getElementById('walletLabel');
+            const net = NETWORKS[currentNetworkKey];
+            try {
+              const provider = new ethers.BrowserProvider(window.ethereum);
+              provider.getBalance(userAccount).then(bal => {
+                userBalance = ethers.formatEther(bal);
+                btn.innerText = `${userAccount.slice(0, 6)}...${userAccount.slice(-4)} (${Number(userBalance).toFixed(2)} 0G)`;
+              });
+            } catch (e) {
+              btn.innerText = `${userAccount.slice(0, 6)}...${userAccount.slice(-4)}`;
+            }
+          }
+        }).catch(() => {});
+
+        window.ethereum.on('chainChanged', () => {
+          window.location.reload();
+        });
+      }
     };
   </script>
 </body>
